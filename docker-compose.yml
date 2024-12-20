@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  ollama:
+    build: ollama  # 指向包含 Dockerfile 的目錄
+    container_name: ollama-gpu
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ollama:/root/.ollama
+    ports:
+      - "11434:11434"
+
+  webui:
+    # image: ghcr.io/open-webui/open-webui:main
+    build: webui
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  ollama:
+  open-webui:
